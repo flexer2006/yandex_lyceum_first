@@ -1,3 +1,3 @@
-module test123
+module project
 
-go 1.23.0
+go 1.26.0
