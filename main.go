@@ -1,50 +1,44 @@
 package main
 
 import (
-	"fmt"
+	"strconv"
 	"time"
 )
 
+const (
+	minute = int64(60)
+	hour   = 60 * minute
+	day    = 24 * hour
+	month  = 30 * day
+	year   = 365 * day
+)
+
 func TimeAgo(pastTime time.Time) string {
-	now := time.Now()
-	duration := now.Sub(pastTime)
+	seconds := int64(time.Since(pastTime) / time.Second)
+	if seconds < 60 {
+		return "just now"
+	}
 
-	seconds := int(duration.Seconds())
-	minutes := seconds / 60
-	hours := minutes / 60
-	days := hours / 24
-	months := days / 30
-	years := days / 365
+	var value int64
+	var unit string
 
-	if years > 0 {
-		if years == 1 {
-			return "1 year ago"
-		}
-		return fmt.Sprintf("%d years ago", years)
+	switch {
+	case seconds >= year:
+		value, unit = seconds/year, "year"
+	case seconds >= month:
+		value, unit = seconds/month, "month"
+	case seconds >= day:
+		value, unit = seconds/day, "day"
+	case seconds >= hour:
+		value, unit = seconds/hour, "hour"
+	default:
+		value, unit = seconds/minute, "minute"
 	}
-	if months > 0 {
-		if months == 1 {
-			return "1 month ago"
-		}
-		return fmt.Sprintf("%d months ago", months)
+
+	n := strconv.FormatInt(value, 10)
+	if value == 1 {
+		return n + " " + unit + " ago"
 	}
-	if days > 0 {
-		if days == 1 {
-			return "1 day ago"
-		}
-		return fmt.Sprintf("%d days ago", days)
-	}
-	if hours > 0 {
-		if hours == 1 {
-			return "1 hour ago"
-		}
-		return fmt.Sprintf("%d hours ago", hours)
-	}
-	if minutes > 0 {
-		if minutes == 1 {
-			return "1 minute ago"
-		}
-		return fmt.Sprintf("%d minutes ago", minutes)
-	}
-	return "just now"
+
+	return n + " " + unit + "s ago"
 }
